@@ -1,0 +1,81 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://Assets/Diamond.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Hearts.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+func on_hit():
+	$Particles2D.emitting = true
+	$Texture.visible = false
+	pass
+"
+
+[sub_resource type="Gradient" id=2]
+offsets = PoolRealArray( 0, 0.434109, 0.891473, 1 )
+colors = PoolColorArray( 1, 1, 1, 1, 0.92549, 0.152941, 0.247059, 1, 0.92549, 0.152941, 0.247059, 1, 0.92549, 0.152941, 0.247059, 0 )
+
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
+
+[sub_resource type="Curve" id=4]
+_data = [ Vector2( 0, 1 ), 0.0, 1.4, 0, 0, Vector2( 0.717105, 0 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=5]
+curve = SubResource( 4 )
+
+[sub_resource type="Curve" id=6]
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=7]
+curve = SubResource( 6 )
+
+[sub_resource type="ParticlesMaterial" id=8]
+trail_size_modifier = SubResource( 7 )
+emission_shape = 1
+emission_sphere_radius = 21.84
+flag_align_y = true
+flag_disable_z = true
+direction = Vector3( 0, 0, 0 )
+spread = 42.9
+gravity = Vector3( 0, 200, 0 )
+initial_velocity = 467.44
+initial_velocity_random = 1.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale = 0.5
+scale_random = 1.0
+scale_curve = SubResource( 5 )
+color_ramp = SubResource( 3 )
+
+[node name="Heart" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -1834.0
+margin_bottom = -994.0
+rect_min_size = Vector2( 86, 86 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Texture" type="NinePatchRect" parent="."]
+margin_right = 86.0
+margin_bottom = 86.0
+texture = ExtResource( 2 )
+region_rect = Rect2( 0, 0, 180, 180 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Particles2D" type="Particles2D" parent="."]
+position = Vector2( 37.7353, 39.8404 )
+emitting = false
+amount = 12
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+process_material = SubResource( 8 )
+texture = ExtResource( 1 )

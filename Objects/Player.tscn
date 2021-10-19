@@ -1,0 +1,259 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Assets/PirateOutlined.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+var speed = 0
+export var max_speed = 1000
+export var acceleration = 5
+export var gravity = 1500
+export var jump_speed = 500
+
+var movement : Vector2
+
+var animation = \"\"
+var new_animation = \"\"
+
+var timer = 0
+
+var input_movement : bool = false
+
+onready var anim = $Visual/Anim
+onready var visual = $Visual
+onready var sprite = $Visual/Sprite
+
+var sprite_size : Vector2
+var half_sprite_size : Vector2
+
+var jumped : bool = false
+
+signal _on_hit()
+
+var left_pressed : bool = false
+var right_pressed : bool = false
+
+func _ready():
+	sprite_size = sprite.texture.get_size()
+	half_sprite_size  = sprite_size * 0.5
+	connect(\"_on_hit\", GameManager,\"on_player_hit\")
+	pass
+
+func _input(event):
+	if event.is_action_pressed(\"ui_up\") and !event.is_echo():
+		_jump()
+	pass
+
+func _process(delta):
+	if Input.is_action_pressed(\"ui_left\") or left_pressed:
+		_move_left(delta)
+	elif Input.is_action_pressed(\"ui_right\") or right_pressed:
+		_move_right(delta)
+	else:
+		speed = lerp(speed, 0, acceleration * delta)
+		timer = 0
+		input_movement = false
+	movement.x = speed
+	_process_animation(delta)
+	pass
+
+func _move_left(delta):
+	speed = lerp(speed, -max_speed, acceleration * delta)
+	timer += delta
+	input_movement = true
+	pass
+
+func _move_right(delta):
+	speed = lerp(speed, max_speed, acceleration * delta)
+	timer += delta
+	input_movement = true
+	pass
+
+func _process_animation(delta):
+	if input_movement:
+		var rotation = lerp(visual.rotation_degrees, sin(timer * 10) * 10, 10 * delta)
+		visual.rotation_degrees = rotation
+	else:
+		visual.rotation_degrees = lerp(visual.rotation_degrees, 0, acceleration * delta)
+	sprite.flip_h = movement.x < 0
+	pass
+
+func _update_animation():
+	if new_animation != animation:
+		animation = new_animation
+		anim.play(animation)
+	pass
+
+func _physics_process(delta):
+	if(!is_on_floor()):
+		movement.y += gravity * delta
+	if(movement.y > 0) and is_on_floor():
+		if jumped:
+			jumped = false
+			anim.play(\"OnFall\")
+	move_and_slide(movement, Vector2.UP)
+	position.x = clamp(position.x, half_sprite_size.x, get_viewport_rect().size.x - half_sprite_size.x)
+	pass
+
+func _jump():
+	if(is_on_floor()):
+		jumped = true
+		movement.y = -jump_speed
+	pass
+
+func take_damage(pos : Vector2):
+	movement.y = -jump_speed * 0.7
+	var dir : Vector2 = (pos - global_position).normalized()
+	speed = -dir.x * 2000
+	anim.play(\"OnDamage\")
+	emit_signal(\"_on_hit\")
+	pass
+
+
+func _on_Left_button_up():
+	left_pressed = false
+	pass # Replace with function body.
+
+
+func _on_Right_button_up():
+	right_pressed = false
+	pass # Replace with function body.
+
+
+func _on_Left_button_down():
+	left_pressed = true
+	pass # Replace with function body.
+
+
+func _on_Right_button_down():
+	right_pressed = true
+	pass # Replace with function body.
+"
+
+[sub_resource type="Animation" id=2]
+resource_name = "Idle"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.0 ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "OnDamage"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 0.5, 1, 2, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 1.5, 0.5 ), Vector2( 0.7, 1.3 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "OnFall"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 0.5, 1 ),
+"update": 0,
+"values": [ Vector2( 1.1, 0.9 ), Vector2( 0.9, 1.1 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=5]
+length = 0.5
+loop = true
+step = 0.25
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.25 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -8.7877, 6.83335 ]
+}
+
+[sub_resource type="CapsuleShape2D" id=6]
+radius = 46.1732
+height = 78.3051
+
+[node name="Player" type="KinematicBody2D"]
+collision_mask = 14
+script = SubResource( 1 )
+gravity = 5000
+jump_speed = 1500
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite" type="Sprite" parent="Visual"]
+position = Vector2( 0.667419, -45.3845 )
+texture = ExtResource( 1 )
+
+[node name="Anim" type="AnimationPlayer" parent="Visual"]
+anims/Idle = SubResource( 2 )
+anims/OnDamage = SubResource( 3 )
+anims/OnFall = SubResource( 4 )
+anims/Run = SubResource( 5 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 1.80678, -45.108 )
+shape = SubResource( 6 )
+
+[node name="Controls" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="Controls"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBC" type="HBoxContainer" parent="Controls/Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Left" type="TextureButton" parent="Controls/Control/HBC"]
+margin_right = 958.0
+margin_bottom = 1080.0
+size_flags_horizontal = 3
+
+[node name="Right" type="TextureButton" parent="Controls/Control/HBC"]
+margin_left = 962.0
+margin_right = 1920.0
+margin_bottom = 1080.0
+size_flags_horizontal = 3
+
+[connection signal="button_down" from="Controls/Control/HBC/Left" to="." method="_on_Left_button_down"]
+[connection signal="button_up" from="Controls/Control/HBC/Left" to="." method="_on_Left_button_up"]
+[connection signal="button_down" from="Controls/Control/HBC/Right" to="." method="_on_Right_button_down"]
+[connection signal="button_up" from="Controls/Control/HBC/Right" to="." method="_on_Right_button_up"]

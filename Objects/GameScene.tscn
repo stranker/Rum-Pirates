@@ -1,0 +1,147 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://Objects/Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Objects/Floor.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/Spawner.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Assets/Background.jpg" type="Texture" id=4]
+[ext_resource path="res://Objects/HealthBar.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Assets/neptun-cat/NeptunCAT.ttf" type="DynamicFontData" id=6]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends CanvasLayer
+
+onready var coins_label = $MarginContainer/Control/Coins
+onready var health_bar = $MarginContainer/Control/HealthBar
+
+func _ready():
+	GameManager.connect(\"update_coins_ui\", self, \"_on_update_coins\")
+	GameManager.connect(\"update_life_ui\", self, \"_on_update_life\")
+	pass
+
+func _on_update_coins(coins : int):
+	coins_label.text = \"Coins:\" + str(coins)
+	pass
+
+func _on_update_life(life : int):
+	health_bar.on_hit(life)
+	pass
+"
+
+[sub_resource type="DynamicFont" id=2]
+size = 56
+use_filter = true
+font_data = ExtResource( 6 )
+
+[node name="GameScene" type="Node2D"]
+
+[node name="TextureRect" type="Sprite" parent="."]
+position = Vector2( 1024, 464 )
+scale = Vector2( 1.36667, 1.36667 )
+texture = ExtResource( 4 )
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = SubResource( 1 )
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = -10.0
+margin_bottom = -10.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Control" type="Control" parent="UI/MarginContainer"]
+margin_right = 1900.0
+margin_bottom = 1060.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HealthBar" parent="UI/MarginContainer/Control" instance=ExtResource( 5 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1900.0
+margin_bottom = 1060.0
+mouse_filter = 2
+
+[node name="Coins" type="Label" parent="UI/MarginContainer/Control"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -286.0
+margin_bottom = 56.0
+custom_fonts/font = SubResource( 2 )
+text = "Coins: 0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Floor" parent="." instance=ExtResource( 2 )]
+position = Vector2( 80, 1000 )
+
+[node name="Floor2" parent="." instance=ExtResource( 2 )]
+position = Vector2( 240, 1000 )
+
+[node name="Floor3" parent="." instance=ExtResource( 2 )]
+position = Vector2( 400, 1000 )
+
+[node name="Floor4" parent="." instance=ExtResource( 2 )]
+position = Vector2( 560, 1000 )
+
+[node name="Floor5" parent="." instance=ExtResource( 2 )]
+position = Vector2( 720, 1000 )
+
+[node name="Floor6" parent="." instance=ExtResource( 2 )]
+position = Vector2( 880, 1000 )
+
+[node name="Floor7" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1040, 1000 )
+
+[node name="Floor8" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1200, 1000 )
+
+[node name="Floor9" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1360, 1000 )
+
+[node name="Floor10" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1520, 1000 )
+
+[node name="Floor11" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1680, 1000 )
+
+[node name="Floor12" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1840, 1000 )
+
+[node name="Floor13" parent="." instance=ExtResource( 2 )]
+position = Vector2( 1360, 1000 )
+
+[node name="Floor14" parent="." instance=ExtResource( 2 )]
+position = Vector2( 2000, 1000 )
+
+[node name="Floor15" parent="." instance=ExtResource( 2 )]
+position = Vector2( 2160, 1000 )
+
+[node name="Floor16" parent="." instance=ExtResource( 2 )]
+position = Vector2( 2320, 1000 )
+
+[node name="Floor17" parent="." instance=ExtResource( 2 )]
+position = Vector2( -400, 1000 )
+
+[node name="Floor18" parent="." instance=ExtResource( 2 )]
+position = Vector2( -240, 1000 )
+
+[node name="Floor19" parent="." instance=ExtResource( 2 )]
+position = Vector2( -80, 1000 )
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 1056, 760 )
+
+[node name="Spawner" parent="." instance=ExtResource( 3 )]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 960, 540 )
+
+[connection signal="_on_hit" from="Player" to="UI/MarginContainer/Control/HealthBar" method="_on_Player__on_hit"]
