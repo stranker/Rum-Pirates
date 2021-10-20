@@ -29,7 +29,7 @@ var half_sprite_size : Vector2
 
 var jumped : bool = false
 
-signal _on_hit()
+signal on_hit()
 
 var left_pressed : bool = false
 var right_pressed : bool = false
@@ -37,7 +37,7 @@ var right_pressed : bool = false
 func _ready():
 	sprite_size = sprite.texture.get_size()
 	half_sprite_size  = sprite_size * 0.5
-	connect(\"_on_hit\", GameManager,\"on_player_hit\")
+	connect(\"on_hit\", GameManager,\"on_player_hit\")
 	pass
 
 func _input(event):
@@ -107,7 +107,7 @@ func take_damage(pos : Vector2):
 	var dir : Vector2 = (pos - global_position).normalized()
 	speed = -dir.x * 2000
 	anim.play(\"OnDamage\")
-	emit_signal(\"_on_hit\")
+	emit_signal(\"on_hit\")
 	pass
 
 

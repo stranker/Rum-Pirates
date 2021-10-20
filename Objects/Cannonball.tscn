@@ -12,6 +12,15 @@ var rotation_speed = 500
 var fall_speed : float
 var movement : Vector2
 
+var active : bool = false
+
+signal on_active(active)
+
+func set_active(value : bool):
+	active = value
+	emit_signal(\"on_active\", active)
+	pass
+
 func _physics_process(delta):
 	fall_speed = lerp(fall_speed, max_fall_speed, delta * 10)
 	movement.y = fall_speed
@@ -28,6 +37,12 @@ func _on_Area2D_body_entered(body):
 	if body.has_method(\"take_damage\"):
 		body.take_damage(global_position)
 		call_deferred(\"queue_free\")
+	pass # Replace with function body.
+
+
+func _on_Cannonball_on_active(is_active):
+	set_physics_process(is_active)
+	set_process(is_active)
 	pass # Replace with function body.
 "
 
@@ -59,5 +74,6 @@ collision_layer = 4
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource( 3 )
 
+[connection signal="on_active" from="." to="." method="_on_Cannonball_on_active"]
 [connection signal="screen_exited" from="VisibilityNotifier" to="." method="_on_VisibilityNotifier_screen_exited"]
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]

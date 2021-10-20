@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Objects/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/Floor.tscn" type="PackedScene" id=2]
@@ -12,6 +12,7 @@ script/source = "extends CanvasLayer
 
 onready var coins_label = $MarginContainer/Control/Coins
 onready var health_bar = $MarginContainer/Control/HealthBar
+onready var anim = $MarginContainer/Control/AnimationPlayer
 
 func _ready():
 	GameManager.connect(\"update_coins_ui\", self, \"_on_update_coins\")
@@ -20,6 +21,7 @@ func _ready():
 
 func _on_update_coins(coins : int):
 	coins_label.text = \"Coins:\" + str(coins)
+	anim.play(\"OnCoinTaken\")
 	pass
 
 func _on_update_life(life : int):
@@ -31,6 +33,22 @@ func _on_update_life(life : int):
 size = 56
 use_filter = true
 font_data = ExtResource( 6 )
+
+[sub_resource type="Animation" id=3]
+resource_name = "OnCoinTaken"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Coins:rect_scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.3 ),
+"transitions": PoolRealArray( 0.5, 0.5, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 1.4, 1.4 ), Vector2( 1, 1 ) ]
+}
 
 [node name="GameScene" type="Node2D"]
 
@@ -78,6 +96,9 @@ text = "Coins: 0"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UI/MarginContainer/Control"]
+anims/OnCoinTaken = SubResource( 3 )
 
 [node name="Floor" parent="." instance=ExtResource( 2 )]
 position = Vector2( 80, 1000 )
@@ -143,5 +164,3 @@ position = Vector2( 1056, 760 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 960, 540 )
-
-[connection signal="_on_hit" from="Player" to="UI/MarginContainer/Control/HealthBar" method="_on_Player__on_hit"]

@@ -26,7 +26,7 @@ func _ready():
 
 func set_active(val):
 	active = val
-	emit_signal(\"_on_active\", active)
+	emit_signal(\"on_active\", active)
 	pass
 
 func _process(delta):
